@@ -1,42 +1,80 @@
-const express = require('express');
-const app = express();
-const axios = require('axios');
-const bodyParser = require('body-parser');
-const dotenv = require('dotenv');
+import { Telegraf } from "telegraf";
+import dotenv from "dotenv";
+import { message } from "telegraf/filters";
+import { session } from "telegraf";
+import * as cron from 'cron';
+import { CronJob } from 'cron';
+
 dotenv.config();
-const PORT = process.env.PORT || 3000;
-const url = 'https://api.telegram.org/bot';
+
+// === ЗМІННІ З ОТОЧЕННЯ ===
 const token = process.env.TELEGRAM_BOT_TOKEN;
+const port = Number(process.env.PORT) || 3000;
+const webhookDomain = process.env.WEB_HOOK_URL;
 
-app.use(bodyParser.json());
+if (!token || !webhookDomain) {
+  console.error("Error : TELEGRAM_BOT_TOKEN або WEB_HOOK_URL don't set!");
+  process.exit(1);
+}
 
-app.post('/', async (req, res) => {
-    const chatId = req.body.message?.chat?.id;
-    const sentMessage = req.body.message?.text;
+console.log("✅ token:", token.slice(0, 10) + "...");
+console.log("✅ port:", port);
+console.log("✅ Webhook URL:", webhookDomain);
 
-    if (!chatId || !sentMessage) {
-        return res.sendStatus(400); 
-    }
+// === ІНІЦІАЛІЗАЦІЯ БОТА ===
+const bot = new Telegraf(token);
+bot.use(session({
+    defaultSession: () => ({
+      step: null,
+      name: null
+    })
+  }));
 
-    let textToSend = 'I am not sure what you mean. Can you please rephrase?';
-    if (sentMessage.match(/start/gi)) {
-        textToSend = 'Hello, I’m forecaste weather-bot! My name is Weathy!🌞\nI can send any messages about the weather anytime you want! It’s awesome, isnt?🌨️ Please type /info to get more info about bot, and I’ll go with you through all settings!'
-    }
+// === ОБРОБКА ПОВІДОМЛЕНЬ ===
+bot.command("start", (ctx) => {
+    ctx.session.step = "wait_name";
+    ctx.reply(`Hello, I’m forecasting weather-bot! My name is Weathy!
 
-    try {
-        const response = await axios.post(`${url}${token}/sendMessage`, {
-            chat_id: chatId,
-            text: textToSend
-        });
+I can send you weather updates anytime you want — it’s awesome, isn’t it?
 
-        res.sendStatus(200); 
-    } catch (err) {
-        console.error('Telegram API error:', err.message);
-        res.sendStatus(500);
-    }
-        
+Please type /time to set time when I can send you forecast update. I’ll guide you through all the settings!`);
 });
 
-app.listen(PORT, () => {
-    console.log(`Listening on port ${PORT}`);
+bot.command("time", (ctx) => {
+    ctx.session.step = "wait time"
+    ctx.reply("Хочеш дізнатися точний час? Напиши будь-що, і я його виведу.");
+    console.log(ctx.message.text)
+})
+
+bot.on(message("text"), (ctx)=>{
+    if (ctx.session.step === "wait time") {
+        const user_msg = ctx.message.text;
+        const [hours, minutes] = user_msg.split(':')
+        console.log("Відповідь користувача для cron:", `0 ${minutes} ${hours} * * *`); // ← тут буде 30:12
+        const validation = cron.validateCronExpression(`0 ${minutes} ${hours} * * *`);
+        console.log(`Is the cron expression valid? ${validation.valid}`);
+        if (!validation.valid) {
+	        console.error(`Validation error: ${validation.error}`);
+        } 
+        ctx.session.step = null;
+        return;
+    }
+
+    ctx.reply("Напиши /start або /time");
+})
+
+
+
+
+// === ЗАПУСК БОТА ===
+bot.launch({
+  webhook: {
+    domain: webhookDomain,
+    port: port,
+    hookPath: "/webhook"
+  }
+}).then(() => {
+  console.log("🚀 Бот запущено з webhook!");
+}).catch((err) => {
+  console.error("❌ Помилка запуску:", err);
 });
