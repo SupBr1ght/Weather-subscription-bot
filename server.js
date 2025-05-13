@@ -36,6 +36,9 @@ try {
 
 // === BOT INITIALIZATION ===
 const bot = new Telegraf(token);
+const app = express();
+app.use(express.json());  
+const hookPath = "/webhook";
 
 if (domain) {
   const publicUrl = `https://${domain}`;
