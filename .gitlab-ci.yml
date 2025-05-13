@@ -6,5 +6,4 @@ deploy:
     SVC_ID: subscription_bot
 
   script:
-    - echo "🔍 Checking token prefix: ${RAILWAY_TOKEN:0:8}…"   # sanity-check
     - railway up --service="$SVC_ID"
