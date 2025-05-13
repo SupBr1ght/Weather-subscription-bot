@@ -1,14 +1,10 @@
-variables:
-  # These should be defined in Settings → CI/CD → Variables
-  RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-  SVC_ID: subscription_bot
-
-stages:
-  - deploy
-
 deploy:
   stage: deploy
   image: ghcr.io/railwayapp/cli:latest
+  variables:
+    # SVC_ID can also be set as a CI/CD variable if you prefer
+    SVC_ID: subscription_bot
+
   script:
-    - echo "Deploying service $SVC_ID"
-    - railway up --service=$SVC_ID
+    - echo "🔍 Checking token prefix: ${RAILWAY_TOKEN:0:8}…"   # sanity-check
+    - railway up --service="$SVC_ID"
