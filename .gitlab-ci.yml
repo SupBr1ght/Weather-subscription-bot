@@ -8,13 +8,7 @@ stages:
 
 deploy:
   stage: deploy
-  image: node:18
-  before_script:
-    - echo "📦 Installing Railway CLI..."
-    - npm install -g @railway/cli
-
-    - echo "Token starts with: ${RAILWAY_TOKEN:0:10}..."
-    - echo "Project ID: $RAILWAY_PROJECT_ID"
+  image: ghcr.io/railwayapp/cli:latest
   script:
     - echo "Deploying service $SVC_ID"
     - railway up --service=$SVC_ID
