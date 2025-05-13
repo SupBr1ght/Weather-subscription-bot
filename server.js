@@ -39,7 +39,6 @@ app.use(express.json());
 async function setupWebhook() {
   await bot.telegram.setWebhook(`${url}/webhook`);
   console.log('Webhook set to', `${url}/webhook`);
-  await bot.launch();
 }
 
 setupWebhook().catch(console.error);
