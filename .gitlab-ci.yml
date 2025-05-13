@@ -6,7 +6,5 @@ deploy:
   image: node:18
   before_script:
     - npm install -g @railway/cli
-    - mkdir -p ~/.railway
-    - echo "$RAILWAY_CONFIG" | base64 -d > ~/.railway/config.json
   script:
-    - railway up --service=subscription_bot --detach
+    - railway up --project $RAILWAY_PROJECT_ID --token $RAILWAY_TOKEN --service=subscription_bot --detach
