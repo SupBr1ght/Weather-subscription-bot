@@ -7,4 +7,4 @@ deploy:
   before_script:
     - npm install -g @railway/cli
   script:
-    - railway up --project $RAILWAY_PROJECT_ID --token $RAILWAY_TOKEN --service=subscription_bot --detach
+    - railway up --service=subscription_bot --detach
