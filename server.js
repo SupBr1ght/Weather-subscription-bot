@@ -19,7 +19,8 @@ const jobs = new Map();
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const URI = process.env.MONGO_DB_URI;
 const port = Number(process.env.PORT) || 3000;
-const timezone = process.env.TZ
+const timezone = process.env.TZ;
+const url = process.env.RAILWAY_PUBLIC_DOMAIN;
 
 // === CONNECT TO MONGO BD ===
 try {
@@ -40,7 +41,6 @@ const app = express();
 app.use(express.json());  
 
 async function setupWebhook() {
-  const url = process.env.RAILWAY_PUBLIC_DOMAIN;
   await bot.telegram.setWebhook(`${url}/webhook`);
   console.log('Webhook set to', `${url}/webhook`);
   await bot.launch();
@@ -251,7 +251,7 @@ await new Promise((res) => setTimeout(res, 1000));
 bot
   .launch({
     webhook: {
-      domain: url.replace(/^https?:\/\//, ""),
+      domain: url,
       port: port,
       hookPath: "/webhook",
     },
