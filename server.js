@@ -47,7 +47,8 @@ if (domain) {
   console.log('Webhook set to', `${publicUrl}${hookPath}`);
 
 } else {
-  await bot.launch();
+  await  bot.telegram.deleteWebhook();
+  bot.launch()
   console.log('Bot launched in polling mode');
 }
 
