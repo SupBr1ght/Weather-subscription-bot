@@ -39,18 +39,11 @@ const bot = new Telegraf(token);
 const app = express();
 app.use(express.json());  
 const hookPath = "/webhook";
+const publicUrl = `https://${domain}`;
+await bot.telegram.setWebhook(`${publicUrl}${hookPath}`);
+app.use(hookPath, bot.webhookCallback(hookPath));
+console.log('Webhook set to', `${publicUrl}${hookPath}`);
 
-if (domain) {
-  const publicUrl = `https://${domain}`;
-  await bot.telegram.setWebhook(`${publicUrl}${hookPath}`);
-  app.use(hookPath, bot.webhookCallback(hookPath));
-  console.log('Webhook set to', `${publicUrl}${hookPath}`);
-
-} else {
-  await  bot.telegram.deleteWebhook();
-  bot.launch()
-  console.log('Bot launched in polling mode');
-}
 
   // 5. start server
 app.get('/', (_req, res) => res.send('OK'));
