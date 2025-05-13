@@ -20,6 +20,7 @@ const ngrokToken = process.env.NGROK_TOKEN;
 const URI = process.env.MONGO_DB_URI;
 const port = Number(process.env.PORT) || 3000;
 const timezone = process.env.TZ
+const domain = process.env.RAILWAY_PUBLIC_DOMAIN;
 // === CONNECT TO MONGO BD ===
 try {
   await mongoose.connect(URI);
@@ -32,8 +33,8 @@ try {
 
 // === BOT INITIALIZATION ===
 const bot = new Telegraf(token);
-
-await bot.telegram.setWebhook(`${url}/webhook`);
+const publicUrl = `https://${domain}`;
+await bot.telegram.setWebhook(`${publicUrl}/webhook`);
 
 if (!token) {
   console.error("Error : TELEGRAM_BOT_TOKEN або WEB_HOOK_URL don't set!");
