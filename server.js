@@ -29,12 +29,14 @@ try {
 }
 
 // === CONNECT TO NGROK ===
-await ngrok.authtoken(ngrokToken);
-const url = await ngrok.connect({ addr: 3000 });
+if (process.env.NGROK_TOKEN) {
+  await ngrok.authtoken(process.env.NGROK_TOKEN);
+  const url = await ngrok.connect({ addr: 3000 });
+  logger.info("NGROK launch:", url);
+} else {
+  logger.info("Skipping ngrok (NGROK_TOKEN is not set)");
+}
 
-logger.info("NGROK launch:", url);
-logger.info("token:", token.slice(0, 10) + "...");
-logger.info("port:", port);
 
 // === BOT INITIALIZATION ===
 const bot = new Telegraf(token);
