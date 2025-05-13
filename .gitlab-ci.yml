@@ -4,5 +4,4 @@ deploy-job:
     RAILWAY_TOKEN: $RAILWAY_TOKEN
     SVC_ID: my-service
   script:
-    - railway login --token "$RAILWAY_TOKEN"
     - railway up --service=$SVC_ID
