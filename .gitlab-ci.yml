@@ -1,10 +1,9 @@
-deploy:
+workflow:
+  rules:
+    - if:  '$CI_COMMIT_BRANCH == "dev"'
+
+railway-deploy:
   stage: deploy
   image: ghcr.io/railwayapp/cli:latest
-  variables:
-    # SVC_ID can also be set as a CI/CD variable if you prefer
-    SVC_ID: subscription_bot
-
   script:
-    - echo "🔍 Checking token prefix: ${RAILWAY_TOKEN:0:8}…"   # sanity-check
-    - railway up --service="$SVC_ID"
+    - railway up --service=$RAILWAY_SERVICE_ID
