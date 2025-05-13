@@ -29,26 +29,29 @@ try {
   logger.info(error);
 }
 
-if (domain) {
-  const publicUrl = `https://${domain}`;
-  await bot.telegram.setWebhook(`${publicUrl}${hookPath}`);
-  app.use(hookPath, bot.webhookCallback(hookPath));
-  console.log('Webhook set to', `${publicUrl}${hookPath}`);
-} else {
-  await bot.launch();
-  console.log('Bot launched in polling mode');
-}
 
-// 5. start server
-app.get('/', (_req, res) => res.send('OK'));
-app.listen(PORT, () => console.log(`🌐 Listening on port ${PORT}`));
+
 
 
 
 // === BOT INITIALIZATION ===
 const bot = new Telegraf(token);
-const publicUrl = `https://${domain}`;
-await bot.telegram.setWebhook(`${publicUrl}/webhook`);
+
+if (domain) {
+  const publicUrl = `https://${domain}`;
+  await bot.telegram.setWebhook(`${publicUrl}${hookPath}`);
+  app.use(hookPath, bot.webhookCallback(hookPath));
+  console.log('Webhook set to', `${publicUrl}${hookPath}`);
+
+} else {
+  await bot.launch();
+  console.log('Bot launched in polling mode');
+}
+
+  // 5. start server
+app.get('/', (_req, res) => res.send('OK'));
+app.listen(port, () => console.log(`Listening on port ${port}`));
+
 
 if (!token) {
   console.error("Error : TELEGRAM_BOT_TOKEN або WEB_HOOK_URL don't set!");
