@@ -25,16 +25,16 @@ try {
   await mongoose.connect(URI);
   logger.info("Succsessfuly connected to mongo db!");
 } catch (error) {
-  console.log(error);
+  logger.info(error);
 }
 
 // === CONNECT TO NGROK ===
 await ngrok.authtoken(ngrokToken);
 const url = await ngrok.connect({ addr: 3000 });
 
-console.log("NGROK launch:", url);
-console.log("token:", token.slice(0, 10) + "...");
-console.log("port:", port);
+logger.info("NGROK launch:", url);
+logger.info("token:", token.slice(0, 10) + "...");
+logger.info("port:", port);
 
 // === BOT INITIALIZATION ===
 const bot = new Telegraf(token);
@@ -92,7 +92,7 @@ bot.command("time", (ctx) => {
 });
 
 bot.command("unsubscribe", async (ctx) => {
-  console.log("🟡 /unsubscribe triggered");
+  logger.info("🟡 /unsubscribe triggered");
   const chatId = ctx.chat.id;
 
   // Always try to update DB
@@ -107,16 +107,16 @@ bot.command("unsubscribe", async (ctx) => {
     return;
   }
 
-  console.log("Updated user in DB:", updatedUser);
+  logger.info("Updated user in DB:", updatedUser);
 
   const job = jobs.get(chatId);
 
   if (job) {
     job.stop();
     jobs.delete(chatId);
-    console.log("Cron job stopped and deleted from memory");
+    logger.info("Cron job stopped and deleted from memory");
   } else {
-    console.log("No job found in memory. Only DB updated.");
+    logger.info("No job found in memory. Only DB updated.");
   }
 
   ctx.reply("You've successfully unsubscribed. Send /resubscribe to start again.");
@@ -165,8 +165,8 @@ bot.on(message("text"), async (ctx) => {
     });
     await userSubscription
       .save()
-      .then(() => console.log("User created"))
-      .catch((err) => console.log(err));
+      .then(() => logger.info("User created"))
+      .catch((err) => logger.info(err));
 
     // Validate time format
     const [hh, mm] = user_msg.split(":");
@@ -186,7 +186,7 @@ bot.on(message("text"), async (ctx) => {
     }
     // Cron expression for every day at hh:mm
     const cronExpression = `0 ${mm} ${hh} * * *`;
-    console.log("User's answer:", cronExpression);
+    logger.info("User's answer:", cronExpression);
 
     const job = new CronJob(
       cronExpression,
@@ -225,7 +225,7 @@ bot.on(message("text"), async (ctx) => {
     jobs.set(user_chat_id, job);
     ctx.reply("You have been subscribed to daily notifications!");
   } catch (error) {
-    console.log("Error: " + error);
+    logger.info("Error: " + error);
     ctx.reply("An error occurred. Please try again.");
   }
 
@@ -245,7 +245,7 @@ bot
     },
   })
   .then(() => {
-    console.log("Bot launched with webhook!");
+    logger.info("Bot launched with webhook!");
   })
   .catch((err) => {
     console.error("Error launchу:", err);
