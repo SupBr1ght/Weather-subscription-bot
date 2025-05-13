@@ -8,6 +8,7 @@ import { UserSubscriptionForecast } from "./models/userSheme.js";
 import { getWeather } from "./WeatherAPI.js";
 import logger from "./logger.js";
 import mongoose from "mongoose";
+import express from 'express';
 
 dotenv.config();
 
@@ -16,7 +17,6 @@ const jobs = new Map();
 
 // === ENVS ===
 const token = process.env.TELEGRAM_BOT_TOKEN;
-const ngrokToken = process.env.NGROK_TOKEN;
 const URI = process.env.MONGO_DB_URI;
 const port = Number(process.env.PORT) || 3000;
 const timezone = process.env.TZ
@@ -28,6 +28,20 @@ try {
 } catch (error) {
   logger.info(error);
 }
+
+if (domain) {
+  const publicUrl = `https://${domain}`;
+  await bot.telegram.setWebhook(`${publicUrl}${hookPath}`);
+  app.use(hookPath, bot.webhookCallback(hookPath));
+  console.log('Webhook set to', `${publicUrl}${hookPath}`);
+} else {
+  await bot.launch();
+  console.log('Bot launched in polling mode');
+}
+
+// 5. start server
+app.get('/', (_req, res) => res.send('OK'));
+app.listen(PORT, () => console.log(`🌐 Listening on port ${PORT}`));
 
 
 
