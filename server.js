@@ -28,14 +28,6 @@ try {
   logger.info(error);
 }
 
-// === CONNECT TO NGROK ===
-if (process.env.NGROK_TOKEN) {
-  await ngrok.authtoken(process.env.NGROK_TOKEN);
-  const url = await ngrok.connect({ addr: 3000 });
-  logger.info("NGROK launch:", url);
-} else {
-  logger.info("Skipping ngrok (NGROK_TOKEN is not set)");
-}
 
 
 // === BOT INITIALIZATION ===
