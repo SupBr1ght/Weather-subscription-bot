@@ -1,0 +1,18 @@
+workflow:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+      when: always
+
+stages:
+  - deploy
+
+deploy-job:
+  stage: deploy
+  image: ghcr.io/railwayapp/cli:latest
+  before_script:
+    - apk add --no-cache bash
+    - mkdir -p ~/.railway
+    - echo "$RAILWAY_CONFIG" | base64 -d > ~/.railway/config.json
+    - railway link --project $RAILWAY_PROJECT_ID
+  script:
+    - railway up --service=$RAILWAY_SERVICE_ID
