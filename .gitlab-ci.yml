@@ -4,11 +4,9 @@ deploy-job:
     SVC_ID: my-service                   # safe to declare here
   script:
     # (sanity checks)
-    - echo "Railway CLI version: $(railway version)"
     - if [ -z "$RAILWAY_TOKEN" ]; then
         echo "Missing RAILWAY_TOKEN; did you add it under Settings → CI/CD → Variables?";
         exit 1;
       fi
-    - echo "🔑 Token prefix: ${RAILWAY_TOKEN:0:8}…"
     # deploy in one step—no `railway login` needed
     - railway up --service="$SVC_ID"
