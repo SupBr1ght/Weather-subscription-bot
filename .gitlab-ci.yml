@@ -1,9 +1,8 @@
-workflow:
-  rules:
-    - if:  '$CI_COMMIT_BRANCH == "dev"'
-
-railway-deploy:
-  stage: deploy
+deploy-job:
   image: ghcr.io/railwayapp/cli:latest
+  variables:
+    RAILWAY_TOKEN: $RAILWAY_TOKEN
+    SVC_ID: my-service
   script:
-    - railway up --service=$RAILWAY_SERVICE_ID
+    - railway login --token "$RAILWAY_TOKEN"
+    - railway up --service=$SVC_ID
