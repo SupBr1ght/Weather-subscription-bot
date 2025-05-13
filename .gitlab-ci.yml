@@ -1,7 +1,6 @@
 deploy-job:
   image: ghcr.io/railwayapp/cli:latest
   variables:
-    RAILWAY_TOKEN: $RAILWAY_TOKEN
     SVC_ID: my-service
   script:
     - railway up --service=$SVC_ID
