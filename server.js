@@ -31,10 +31,6 @@ try {
 }
 
 
-
-
-
-
 // === BOT INITIALIZATION ===
 const bot = new Telegraf(token);
 const app = express();
@@ -50,7 +46,6 @@ setupWebhook().catch(console.error);
 
   // 5. start server
 app.get('/', (_req, res) => res.send('OK'));
-app.listen(port, () => console.log(`Listening on port ${port}`));
 
 
 if (!token) {
