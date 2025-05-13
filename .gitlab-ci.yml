@@ -8,8 +8,6 @@ deploy:
     - echo "📦 Installing Railway CLI..."
     - npm install -g @railway/cli
 
-    - echo "Token starts with: ${RAILWAY_TOKEN:0:10}..."
-    - echo "Project ID: $RAILWAY_PROJECT_ID"
   script:
     - echo "🚀 Deploying..."
     - railway up --service=subscription_bot --detach
