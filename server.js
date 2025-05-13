@@ -20,7 +20,7 @@ const token = process.env.TELEGRAM_BOT_TOKEN;
 const URI = process.env.MONGO_DB_URI;
 const port = Number(process.env.PORT) || 3000;
 const timezone = process.env.TZ
-const domain = process.env.RAILWAY_PUBLIC_DOMAIN;
+
 // === CONNECT TO MONGO BD ===
 try {
   await mongoose.connect(URI);
@@ -38,12 +38,15 @@ try {
 const bot = new Telegraf(token);
 const app = express();
 app.use(express.json());  
-const hookPath = "/webhook";
-const publicUrl = `https://${domain}`;
-await bot.telegram.setWebhook(`${publicUrl}${hookPath}`);
-app.use(hookPath, bot.webhookCallback(hookPath));
-console.log('Webhook set to', `${publicUrl}${hookPath}`);
 
+async function setupWebhook() {
+  const url = process.env.RAILWAY_PUBLIC_DOMAIN;
+  await bot.telegram.setWebhook(`${url}/webhook`);
+  console.log('Webhook set to', `${url}/webhook`);
+  await bot.launch();
+}
+
+setupWebhook().catch(console.error);
 
   // 5. start server
 app.get('/', (_req, res) => res.send('OK'));
