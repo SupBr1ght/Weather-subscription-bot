@@ -55,13 +55,3 @@ const cronJobs = new Map();
     return job;
 
  }
- 
-    // Pass latitude and longitude as parameters to the function if needed
-    // Example: myFunction(latitude, longitude);
- export function stopJob(chatId) {
-  const job = cronJobs.get(chatId);
-  if (job) {
-    job.stop();
-    cronJobs.delete(chatId);
-  }
-}

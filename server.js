@@ -24,6 +24,13 @@ const port = Number(process.env.PORT) || 3000;
 const timezone = process.env.TZ;
 const url = process.env.RAILWAY_PUBLIC_DOMAIN;
 
+// === BOT INITIALIZATION ===
+const bot = new Telegraf(token);
+const app = express();
+app.use(express.json());
+
+
+
 // === CONNECT TO MONGO BD ===
 try {
   await mongoose.connect(URI);
@@ -33,13 +40,6 @@ try {
 } catch (error) {
   logger.info(error);
 }
-
-
-
-// === BOT INITIALIZATION ===
-const bot = new Telegraf(token);
-const app = express();
-app.use(express.json());
 
 
 
