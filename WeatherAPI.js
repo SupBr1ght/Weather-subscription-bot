@@ -6,7 +6,6 @@ const API_KEY = process.env.WEATHER_API_KEY;
 
 export const getWeather = async (latitude, longtitude) => {
   try {
-    logger.info("🌍 Sending request to OpenWeather with:", latitude, longtitude, API_KEY.slice(0, 5) + "...");
     const response = await axios.get(
       `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longtitude}&appid=${API_KEY}`
     );
@@ -21,7 +20,6 @@ export const getWeather = async (latitude, longtitude) => {
     logger.info(main);
     return [weather, main];
   } catch (error) {
-    logger.error("❌ Axios error:", error?.response?.data || error.message);
     logger.error(error);
     return "Some error while fetching data occurred";
   }
