@@ -9,6 +9,7 @@ import { getWeather } from "./WeatherAPI.js";
 import logger from "./logger.js";
 import mongoose from "mongoose";
 import express from "express";
+import { createWeatherJob } from "./services/CronService.js";
 
 dotenv.config();
 
@@ -153,7 +154,6 @@ bot.on("location", async (ctx) => {
 });
 
 bot.on(message("text"), async (ctx) => {
-  try {
     const user_chat_id = ctx.chat.id;
     const user_msg = ctx.message.text;
     const { latitude, longitude } = ctx.session.location ?? {};
@@ -169,6 +169,8 @@ bot.on(message("text"), async (ctx) => {
       latitude: latitude,
       longitude: longitude,
     });
+
+
     await userSubscription
       .save()
       .then(() => logger.info("User created"))
@@ -190,68 +192,10 @@ bot.on(message("text"), async (ctx) => {
       ctx.session.step = null;
       return;
     }
-    // Cron expression for every day at hh:mm
-    const cronExpression = `0 ${mm} ${hh} * * *`;
-    logger.info("User's answer:", cronExpression);
-    logger.info(`Cron job for ${user_chat_id} created at ${cronExpression}`);
 
-    let user_id = ctx.chat.id;
-
-    const job = new CronJob(
-      cronExpression,
-      async () => {
-        try {
-          const user = await UserSubscriptionForecast.findOne({
-            chatId: user_id,
-          });
-
-          if (!user || !user.latitude || !user.longitude) {
-            await bot.telegram.sendMessage(
-              user_id,
-              "Please send your location using /geo before setting the time."
-            );
-            return;
-          }
-          const { latitude, longitude } = user;
-          logger.info(latitude, longitude + " Before getting forecast");
-          const weather_data = await getWeather(latitude, longitude);
-          logger.info("📡 Weather data:", weather_data);
-          logger.info(typeof weather_data);
-          const [weather, main] = weather_data;
-          const iconUrl = `http://openweathermap.org/img/wn/${weather.icon}@2x.png`;
-          const celcius = main - 273.15;
-          await bot.telegram.sendPhoto(user_chat_id, iconUrl, {
-            caption: `🌡️ Temperature: ${celcius.toFixed(2)}°C\n Condition: ${
-              weather.main
-            }\n📝 Description: ${weather.description}`,
-          });
-          logger.info(typeof weather);
-          logger.info(weather);
-          logger.info(
-            `Location sent: ${latitude}, ${longitude} Weather sent: ${weather.main}`
-          );
-        } catch (error) {
-          await bot.telegram.sendMessage(
-            user_chat_id,
-            `Sorry, I couldn't retrieve the weather for your location.`
-          );
-        }
-      },
-      null,
-      true,
-      timezone
-    );
-    // Pass latitude and longitude as parameters to the function if needed
-    // Example: myFunction(latitude, longitude);
-    jobs.set(user_chat_id, job);
-    ctx.reply("You have been subscribed to daily notifications!");
-    ctx.session.step = null;
-    return;
-  } catch (error) {
-    logger.info("Error: " + error);
-    ctx.reply("An error occurred.");
-  }
-});
+    createWeatherJob(user_chat_id, user_msg, timezone, bot);
+  })
+  
 
 await new Promise((res) => setTimeout(res, 1000));
 
