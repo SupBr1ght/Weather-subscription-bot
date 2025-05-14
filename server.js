@@ -8,7 +8,7 @@ import { UserSubscriptionForecast } from "./models/userSheme.js";
 import { getWeather } from "./WeatherAPI.js";
 import logger from "./logger.js";
 import mongoose from "mongoose";
-import express from 'express';
+import express from "express";
 
 dotenv.config();
 
@@ -30,22 +30,20 @@ try {
   logger.info(error);
 }
 
-
 // === BOT INITIALIZATION ===
 const bot = new Telegraf(token);
 const app = express();
-app.use(express.json());  
+app.use(express.json());
 
 async function setupWebhook() {
   await bot.telegram.setWebhook(`${url}/webhook`);
-  console.log('Webhook set to', `${url}/webhook`);
+  console.log("Webhook set to", `${url}/webhook`);
 }
 
 setupWebhook().catch(console.error);
 
-  // 5. start server
-app.get('/', (_req, res) => res.send('OK'));
-
+// 5. start server
+app.get("/", (_req, res) => res.send("OK"));
 
 if (!token) {
   console.error("Error : TELEGRAM_BOT_TOKEN або WEB_HOOK_URL don't set!");
@@ -68,7 +66,9 @@ bot.use(
 bot.command("start", async (ctx) => {
   const user = await UserSubscriptionForecast.findOne({ chatId: ctx.chat.id });
   if (user && user.enabled === true) {
-    ctx.reply("You've already subscribed!, If you want unsubscribe please send /unsubscribe");
+    ctx.reply(
+      "You've already subscribed!, If you want unsubscribe please send /unsubscribe"
+    );
   } else {
     ctx.reply(`Hello, I’m forecasting weather-bot! My name is Weathy!
 
@@ -125,23 +125,25 @@ bot.command("unsubscribe", async (ctx) => {
     logger.info("No job found in memory. Only DB updated.");
   }
 
-  ctx.reply("You've successfully unsubscribed. Send /resubscribe to start again.");
+  ctx.reply(
+    "You've successfully unsubscribed. Send /resubscribe to start again."
+  );
 });
 
 bot.command("resubscribe", async (ctx) => {
   await UserSubscriptionForecast.findOneAndUpdate(
-    {chatId: ctx.chat.id},
-    {enabled: true}
-  )
+    { chatId: ctx.chat.id },
+    { enabled: true }
+  );
   const job = jobs.get(ctx.chat.id);
 
-   if (job) {
+  if (job) {
     job.start();
     ctx.reply("You've succsesfully resubscribed.");
   } else {
     ctx.reply("You won't resubscribe.");
   }
-})
+});
 
 bot.on("location", async (ctx) => {
   const { latitude, longitude } = ctx.message.location;
@@ -198,7 +200,17 @@ bot.on(message("text"), async (ctx) => {
       cronExpression,
       async () => {
         try {
-          const { latitude, longitude } = ctx.session.location;
+          const user = await UserSubscriptionForecast.findOne({
+            chatId: ctx.chat.id,
+          });
+
+          if (!user || !user.latitude || !user.longtitude) {
+            ctx.reply(
+              "Please send your location using /geo before setting the time."
+            );
+            return;
+          }
+          const { latitude, longitude } = user
           logger.info(latitude, longitude + " Before getting forecast");
           const weather_data = await getWeather(latitude, longitude);
           logger.info(typeof weather_data);
