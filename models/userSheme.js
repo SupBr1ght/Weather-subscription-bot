@@ -7,7 +7,7 @@ const UserSubscription = new Schema({
     cronTime: {type: String, required: true},
     timeZone: { type: String, default: 'Europe/Kyiv' },
     latitude: {type: Number, required: true},
-    longtitude: {type: Number, required: true},
+    longitude: {type: Number, required: true},
     enabled: { type: Boolean, default: true, required: true }
 })
 
