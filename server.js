@@ -219,6 +219,7 @@ bot.on(message("text"), async (ctx) => {
           const { latitude, longitude } = user;
           logger.info(latitude, longitude + " Before getting forecast");
           const weather_data = await getWeather(latitude, longitude);
+          logger.info("📡 Weather data:", weather_data);
           logger.info(typeof weather_data);
           const [weather, main] = weather_data;
           const iconUrl = `http://openweathermap.org/img/wn/${weather.icon}@2x.png`;
