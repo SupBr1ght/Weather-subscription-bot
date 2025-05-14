@@ -167,7 +167,7 @@ bot.on(message("text"), async (ctx) => {
       cronTime: ctx.message.text,
       enabled: true,
       latitude: latitude,
-      longtitude: longitude,
+      longitude: longitude,
     });
     await userSubscription
       .save()
@@ -206,7 +206,7 @@ bot.on(message("text"), async (ctx) => {
             chatId: user_id,
           });
 
-          if (!user || !user.latitude || !user.longtitude) {
+          if (!user || !user.latitude || !user.longitude) {
             await bot.telegram.sendMessage(
               user_id,
               "Please send your location using /geo before setting the time."
