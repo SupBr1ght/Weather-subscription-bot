@@ -10,6 +10,7 @@ import logger from "./logger.js";
 import mongoose from "mongoose";
 import express from "express";
 import { createWeatherJob } from "./services/CronService.js";
+import { restoreCronJobs } from "./services/RestoreCron.js";
 
 dotenv.config();
 
@@ -27,14 +28,20 @@ const url = process.env.RAILWAY_PUBLIC_DOMAIN;
 try {
   await mongoose.connect(URI);
   logger.info("Succsessfuly connected to mongo db!");
+  //Restore cron jobs
+   await restoreCronJobs(bot, timezone);
 } catch (error) {
   logger.info(error);
 }
+
+
 
 // === BOT INITIALIZATION ===
 const bot = new Telegraf(token);
 const app = express();
 app.use(express.json());
+
+
 
 async function setupWebhook() {
   await bot.telegram.setWebhook(`${url}/webhook`);
