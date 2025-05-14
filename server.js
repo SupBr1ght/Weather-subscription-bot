@@ -82,7 +82,7 @@ And then boom! You will get your desired message on time!
 });
 
 bot.command("geo", async (ctx) => {
-  if (!ctx.message.location) {
+  if (!user.location) {
     ctx.reply(
       "Please share with me your geolocation that I can define what weather you need for based on your location"
     );
@@ -98,7 +98,7 @@ bot.command("time", (ctx) => {
 });
 
 bot.command("unsubscribe", async (ctx) => {
-  logger.info("🟡 /unsubscribe triggered");
+  logger.info("/unsubscribe triggered");
   const chatId = ctx.chat.id;
 
   // Always try to update DB
