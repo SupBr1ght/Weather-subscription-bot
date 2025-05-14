@@ -147,40 +147,22 @@ bot.command("resubscribe", async (ctx) => {
 });
 
 bot.on("location", async (ctx) => {
-  const user = await UserSubscriptionForecast.findOne({
-            chatId: ctx.chat.id,
-          });
+    const { latitude, longitude } = ctx.message.location;
 
-          if (!user || !user.latitude || !user.longtitude) {
-            ctx.reply(
-              "Please send your location using /geo before setting the time."
-            );
-            return;
-          }
-          const { latitude, longitude } = user
-  logger.info(`User location: ${latitude}, ${longitude}`);
+  // Сесія зберігає координати тимчасово
+  ctx.session.location = { latitude, longitude };
 
-  ctx.reply(
-    "Thank you for sharing your location! Now please type /time and we'll get down with it."
-  );
+  ctx.reply("Great! Now type /time and send your desired notification time.");
 });
 
 bot.on(message("text"), async (ctx) => {
   const user_chat_id = ctx.chat.id;
   const user_msg = ctx.message.text;
-  try {
-    const user = await UserSubscriptionForecast.findOne({
-            chatId: ctx.chat.id,
-          });
-
-          if (!user || !user.latitude || !user.longtitude) {
-            ctx.reply(
-              "Please send your location using /geo before setting the time."
-            );
-            return;
-          }
-    const { latitude, longitude } = user
-    logger.info(latitude, longitude + " Before creating user");
+  const { latitude, longitude } = ctx.session.location ?? {};
+  if (!latitude || !longitude) {
+    ctx.reply("Please send your location using /geo first.");
+    return;
+  }
     // create user
     const userSubscription = new UserSubscriptionForecast({
       chatId: ctx.chat.id,
