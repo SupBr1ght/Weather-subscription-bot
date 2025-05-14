@@ -191,8 +191,7 @@ bot.on(message("text"), async (ctx) => {
       return;
     }
     // Cron expression for every day at hh:mm
-    // const cronExpression = `0 ${mm} ${hh} * * *`;
-    const cronExpression = "*/1 * * * *"
+    const cronExpression = `0 ${mm} ${hh} * * *`;
     logger.info("User's answer:", cronExpression);
     logger.info(`Cron job for ${user_chat_id} created at ${cronExpression}`);
 
