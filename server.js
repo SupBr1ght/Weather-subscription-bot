@@ -82,6 +82,7 @@ And then boom! You will get your desired message on time!
 });
 
 bot.command("geo", async (ctx) => {
+  const user = await UserSubscriptionForecast.findOne({ chatId: ctx.chat.id });
   if (!user.location) {
     ctx.reply(
       "Please share with me your geolocation that I can define what weather you need for based on your location"
