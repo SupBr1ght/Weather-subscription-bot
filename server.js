@@ -156,13 +156,14 @@ bot.on("location", async (ctx) => {
 });
 
 bot.on(message("text"), async (ctx) => {
-  const user_chat_id = ctx.chat.id;
-  const user_msg = ctx.message.text;
-  const { latitude, longitude } = ctx.session.location ?? {};
-  if (!latitude || !longitude) {
-    ctx.reply("Please send your location using /geo first.");
-    return;
-  }
+  try {
+    const user_chat_id = ctx.chat.id;
+    const user_msg = ctx.message.text;
+    const { latitude, longitude } = ctx.session.location ?? {};
+    if (!latitude || !longitude) {
+      ctx.reply("Please send your location using /geo first.");
+      return;
+    }
     // create user
     const userSubscription = new UserSubscriptionForecast({
       chatId: ctx.chat.id,
@@ -242,13 +243,12 @@ bot.on(message("text"), async (ctx) => {
     // Example: myFunction(latitude, longitude);
     jobs.set(user_chat_id, job);
     ctx.reply("You have been subscribed to daily notifications!");
+    ctx.session.step = null;
+    return;
   } catch (error) {
     logger.info("Error: " + error);
-    ctx.reply("An error occurred. Please try again.");
+    ctx.reply("An error occurred.");
   }
-
-  ctx.session.step = null;
-  return;
 });
 
 await new Promise((res) => setTimeout(res, 1000));
