@@ -147,7 +147,7 @@ bot.command("resubscribe", async (ctx) => {
 });
 
 bot.on("location", async (ctx) => {
-    const { latitude, longitude } = ctx.message.location;
+  const { latitude, longitude } = ctx.message.location;
 
   // Сесія зберігає координати тимчасово
   ctx.session.location = { latitude, longitude };
@@ -196,22 +196,24 @@ bot.on(message("text"), async (ctx) => {
     // Cron expression for every day at hh:mm
     const cronExpression = `0 ${mm} ${hh} * * *`;
     logger.info("User's answer:", cronExpression);
+    let user_id = ctx.chat.id;
 
     const job = new CronJob(
       cronExpression,
       async () => {
         try {
           const user = await UserSubscriptionForecast.findOne({
-            chatId: ctx.chat.id,
+            chatId: user_id,
           });
 
           if (!user || !user.latitude || !user.longtitude) {
-            ctx.reply(
+            await bot.telegram.sendMessage(
+              user_id,
               "Please send your location using /geo before setting the time."
             );
             return;
           }
-          const { latitude, longitude } = user
+          const { latitude, longitude } = user;
           logger.info(latitude, longitude + " Before getting forecast");
           const weather_data = await getWeather(latitude, longitude);
           logger.info(typeof weather_data);
