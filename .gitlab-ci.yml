@@ -1,21 +1,19 @@
-deploy-job:
-  image: node:18-bullseye
-  variables:
-    SVC_ID: my-service
-  script:
-    - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
-    - eval $(ssh-agent -s)
-    - mkdir -p ~/.ssh
-    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
-    - chmod 600 ~/.ssh/id_ed25519
-    - ssh-keyscan git.foxminded.ua >> ~/.ssh/known_hosts
-    - git remote remove origin
-    - git remote set-url origin git@git.foxminded.ua:foxstudent108179/subscription-bot.git
-    - git remote -v  
-    - git fetch origin
-    - |
-      if [ -z "$RAILWAY_TOKEN" ]; then
-        echo "Missing RAILWAY_TOKEN"
-        exit 1
-      fi
-    - railway up --service="$SVC_ID"
+script:
+  - mkdir -p ~/.ssh
+  - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+  - chmod 600 ~/.ssh/id_ed25519
+  - eval $(ssh-agent -s)
+  - ssh-add ~/.ssh/id_ed25519
+  - ssh-keyscan git.foxminded.ua >> ~/.ssh/known_hosts
+
+  # Перевірка origin
+  - git remote -v
+  - git fetch origin
+
+  # Перевірка Railway
+  - if [ -z "$RAILWAY_TOKEN" ]; then
+      echo "Missing RAILWAY_TOKEN";
+      exit 1;
+    fi
+
+  - railway up --service="$SVC_ID"
