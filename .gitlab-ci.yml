@@ -15,6 +15,7 @@ deploy-job:
 
     # Optional: verify the remote works
     - git remote set-url origin git@git.foxminded.ua:foxstudent108179/subscription-bot.git
+    - git config --global url."git@git.foxminded.ua:".insteadOf "http://git.foxminded.ua/"
     - git fetch
     # (sanity checks)
     - if [ -z "$RAILWAY_TOKEN" ]; then
