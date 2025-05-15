@@ -1,5 +1,5 @@
 deploy-job:
-  image: ghcr.io/railwayapp/cli:latest
+  image: node:18-bullseye
   variables:
     SVC_ID: my-service
   script:
@@ -10,7 +10,8 @@ deploy-job:
     - chmod 600 ~/.ssh/id_ed25519
     - ssh-keyscan git.foxminded.ua >> ~/.ssh/known_hosts
     - git remote remove origin
-    - git remote add origin git@git.foxminded.ua:foxstudent108179/subscription-bot.git
+    - git remote set-url origin git@git.foxminded.ua:foxstudent108179/subscription-bot.git
+    - git remote -v  
     - git fetch origin
     - |
       if [ -z "$RAILWAY_TOKEN" ]; then
