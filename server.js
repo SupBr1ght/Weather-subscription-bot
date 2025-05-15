@@ -166,13 +166,17 @@ bot.on(message("text"), async (ctx) => {
       return;
     }
     // create user
-    const userSubscription = new UserSubscriptionForecast({
+   await UserSubscriptionForecast.findOneAndUpdate(
+    { chatId: ctx.chat.id },
+    {
       chatId: ctx.chat.id,
       cronTime: ctx.message.text,
       enabled: true,
-      latitude: latitude,
-      longitude: longitude,
-    });
+      latitude,
+      longitude,
+    },
+    { upsert: true, new: true }
+  );
 
 
     await userSubscription
