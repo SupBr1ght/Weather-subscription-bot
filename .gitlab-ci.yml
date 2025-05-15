@@ -1,26 +1,19 @@
-deploy-job:
-  image: ghcr.io/railwayapp/cli:latest  # v4.5.0
-  variables:
-    SVC_ID: my-service                   # safe to declare here
-  script:
-    # Set up the SSH directory and permissions
-    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
-    - eval $(ssh-agent -s)
-    - mkdir -p ~/.ssh
-    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
-    - chmod 600 ~/.ssh/id_ed25519
+script:
+  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+  - eval $(ssh-agent -s)
+  - mkdir -p ~/.ssh
+  - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+  - chmod 600 ~/.ssh/id_ed25519
+  - ssh-keyscan git.foxminded.ua >> ~/.ssh/known_hosts
 
-    # Add GitLab to known_hosts (you can use ssh-keyscan or copy manually)
-    - ssh-keyscan git.foxminded.ua >> ~/.ssh/known_hosts
+  - git remote remove origin
 
-    # Optional: verify the remote works
-    - git remote set-url origin git@git.foxminded.ua:foxstudent108179/subscription-bot.git
-    - git config --global url."git@git.foxminded.ua:".insteadOf "http://git.foxminded.ua/"
-    - git fetch
-    # (sanity checks)
-    - if [ -z "$RAILWAY_TOKEN" ]; then
-        echo "Missing RAILWAY_TOKEN; did you add it under Settings → CI/CD → Variables?";
-        exit 1;
-      fi
-    # deploy in one step—no `railway login` needed
-    - railway up --service="$SVC_ID"
+  - git remote add origin git@git.foxminded.ua:foxstudent108179/subscription-bot.git
+  - git fetch origin
+
+  # sanity checks
+  - if [ -z "$RAILWAY_TOKEN" ]; then
+      echo "Missing RAILWAY_TOKEN";
+      exit 1;
+    fi
+  - railway up --service="$SVC_ID"
