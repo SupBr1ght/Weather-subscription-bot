@@ -6,6 +6,14 @@ import logger from "../logger.js";
 const cronJobs = new Map(); 
     //dependency invertion in the action!
  export function createWeatherJob(chatId, cronExpression, timezone, bot) {
+     // Stop and delete existing job if exists
+    const existingJob = cronJobs.get(chatId);
+    if (existingJob) {
+      existingJob.stop();
+      cronJobs.delete(chatId);
+      logger.info(`Stopped existing cron job for chatId: ${chatId}`);
+    }
+
     const job = new CronJob(
       cronExpression,
       async () => {
