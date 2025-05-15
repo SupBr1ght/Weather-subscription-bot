@@ -205,7 +205,7 @@ bot.on(message("text"), async (ctx) => {
   })
   
 
-await new Promise((res) => setTimeout(res, 1000));
+await new Promise((res) => setTimeout(res, 1500));
 
 // === LAUNCH BOT ===
 bot
