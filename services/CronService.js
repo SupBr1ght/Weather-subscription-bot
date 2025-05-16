@@ -19,12 +19,12 @@ const cronJobs = new Map();
       async () => {
         try {
           const user = await UserSubscriptionForecast.findOne({
-            chatId: user_id,
+            chatId: chatId,
           });
 
           if (!user || !user.latitude || !user.longitude) {
             await bot.telegram.sendMessage(
-              user_id,
+              chatId,
               "Please send your location using /geo before setting the time."
             );
             return;
@@ -38,7 +38,7 @@ const cronJobs = new Map();
           const [weather, main] = weather_data;
           const iconUrl = `http://openweathermap.org/img/wn/${weather.icon}@2x.png`;
           const celcius = main - 273.15;
-          await bot.telegram.sendPhoto(user_chat_id, iconUrl, {
+          await bot.telegram.sendPhoto(chatId, iconUrl, {
             caption: `🌡️ Temperature: ${celcius.toFixed(2)}°C\n Condition: ${
               weather.main
             }\n📝 Description: ${weather.description}`,
@@ -50,7 +50,7 @@ const cronJobs = new Map();
           );
         } catch (error) {
           await bot.telegram.sendMessage(
-            user_chat_id,
+            chatId,
             `Sorry, I couldn't retrieve the weather for your location.`
           );
         }
@@ -61,6 +61,7 @@ const cronJobs = new Map();
     );
 
     cronJobs.set(chatId, job);
+    logger.info(`Cron job scheduled for chatId: ${chatId} with expression: ${cronExpression}`);
     return job;
 
  }
