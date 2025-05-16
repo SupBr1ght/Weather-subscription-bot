@@ -134,17 +134,25 @@ bot.command("unsubscribe", async (ctx) => {
 });
 
 bot.command("resubscribe", async (ctx) => {
-  await UserSubscriptionForecast.findOneAndUpdate(
-    { chatId: ctx.chat.id },
-    { enabled: true }
+  const chatId = ctx.chat.id;
+  const user = await UserSubscriptionForecast.findOneAndUpdate(
+    { chatId },
+    { enabled: true },
+    { new: true }
   );
-  const job = jobs.get(ctx.chat.id);
+
+  const job = jobs.get(chatId);
 
   if (job) {
     job.start();
-    ctx.reply("You've succsesfully resubscribed.");
+    ctx.reply("You've successfully resubscribed.");
+  } else if (user?.cronTime) {
+    const [hh, mm] = user.cronTime.split(":");
+    const cronExpression = `0 ${mm} ${hh} * * *`;
+    createWeatherJob(chatId, cronExpression, user.timeZone || "Europe/Kyiv", bot);
+    ctx.reply("You've been resubscribed and your job has been restored.");
   } else {
-    ctx.reply("You won't resubscribe.");
+    ctx.reply("Missing time info. Please send /time again to resubscribe.");
   }
 });
 
