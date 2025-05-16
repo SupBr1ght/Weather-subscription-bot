@@ -9,18 +9,17 @@ export const getWeather = async (latitude, longtitude) => {
     const response = await axios.get(
       `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longtitude}&appid=${API_KEY}`
     );
-    if (response.data.length === 0) {
-      return "We don't have info about weather in based on your position";
+    if (response.data && response.data.weather && response.data.main) {
+      const weather = response.data.weather[0];
+      logger.info(`This is object weather`);
+      logger.info(weather);
+      const main = response.data.main.temp;
+      logger.info(`This is object main`);
+      logger.info(main);
+      return [weather, main];
     }
-    const weather = response.data.weather[0];
-    logger.info(`This is object weather`);
-    logger.info(weather);
-    const main = response.data.main.temp;
-    logger.info(`This is object main`);
-    logger.info(main);
-    return [weather, main];
   } catch (error) {
-    logger.error(error);
-    return "Some error while fetching data occurred";
+    logger.error("Malformed OpenWeather response", response.data);
+    return null;
   }
 };

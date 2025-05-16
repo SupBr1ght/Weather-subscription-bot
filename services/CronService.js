@@ -31,8 +31,9 @@ const cronJobs = new Map();
           }
           const { latitude, longitude } = user;
           logger.info(latitude, longitude + " Before getting forecast");
+          logger.info(`CRON TRIGGERED for chatId ${chatId}`);
           const weather_data = await getWeather(latitude, longitude);
-          logger.info("📡 Weather data:", weather_data);
+          logger.info("Weather data:", weather_data);
           logger.info(typeof weather_data);
           const [weather, main] = weather_data;
           const iconUrl = `http://openweathermap.org/img/wn/${weather.icon}@2x.png`;

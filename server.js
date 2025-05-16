@@ -200,7 +200,7 @@ bot.on(message("text"), async (ctx) => {
       ctx.session.step = null;
       return;
     }
-
+    logger.info(`Cron triggered for chat id ${user_chat_id}`)
     createWeatherJob(user_chat_id, user_msg, timezone, bot);
   })
   
