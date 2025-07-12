@@ -25,6 +25,12 @@ dotenv for config
 
 1. Clone the repo
 bash
-git clone https://github.com/SupBr1ght/weather-subscription-bot.git
-cd weather-subscription-bot
-npm install
+-git clone https://github.com/SupBr1ght/weather-subscription-bot.git
+-cd weather-subscription-bot
+-npm install
+
+2. Add .env file:
+API_KEY=your_weather_api_key (from openweather.com)
+
+3. Run the bot:
+npm start
