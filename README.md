@@ -1,4 +1,4 @@
-#Weather Subscription Bot
+Weather Subscription Bot
 
 A simple Node.js bot that lets users get current weather based on their geolocation — and subscribe to daily updates using cron.
 
